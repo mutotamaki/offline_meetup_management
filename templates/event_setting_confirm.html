@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>イベント設定の内容確認</h2>
+
+<table border="1" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+    <tr>
+        <th style="background-color: #f0f0f0; padding: 10px; text-align: left; width: 30%;">項目</th>
+        <th style="background-color: #f0f0f0; padding: 10px; text-align: left;">内容</th>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">オフ会名</td>
+        <td style="padding: 10px;">{{ event_name }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">開催日</td>
+        <td style="padding: 10px;">{{ event_date }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">開催時間</td>
+        <td style="padding: 10px;">{{ event_time_start }} ~ {{ event_time_end }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">開催場所</td>
+        <td style="padding: 10px;">{{ event_place }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">参加費</td>
+        <td style="padding: 10px;">{{ event_fee }}円</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">募集人数</td>
+        <td style="padding: 10px;">{{ event_member }}人</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">キャンセル期限</td>
+        <td style="padding: 10px;">{{ event_cancel }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">中止の場合</td>
+        <td style="padding: 10px;">{{ event_cancel_case }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">募集締切</td>
+        <td style="padding: 10px;">{{ event_deadline }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold; vertical-align: top;">詳細</td>
+        <td style="padding: 10px; white-space: pre-wrap;">{{ event_detail }}</td>
+    </tr>
+</table>
+
+<div style="margin: 20px 0;">
+    <form method="POST" action="./event_list" style="display: inline;">
+        <!-- 隠しフィールドで入力データを保持 -->
+        <input type="hidden" name="event_name" value="{{ event_name }}">
+        <input type="hidden" name="event_date" value="{{ event_date }}">
+        <input type="hidden" name="event_time_start" value="{{ event_time_start }}">
+        <input type="hidden" name="event_time_end" value="{{ event_time_end }}">
+        <input type="hidden" name="event_place" value="{{ event_place }}">
+        <input type="hidden" name="event_fee" value="{{ event_fee }}">
+        <input type="hidden" name="event_member" value="{{ event_member }}">
+        <input type="hidden" name="event_cancel" value="{{ event_cancel }}">
+        <input type="hidden" name="event_cancel_case" value="{{ event_cancel_case }}">
+        <input type="hidden" name="event_deadline" value="{{ event_deadline }}">
+        <input type="hidden" name="event_detail" value="{{ event_detail }}">
+        
+        <input type="submit" value="この内容で登録" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; margin-right: 10px;">
+    </form>
+    
+    <form method="GET" action="./host" style="display: inline;">
+        <input type="submit" value="修正する" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; cursor: pointer;">
+    </form>
+</div>
+
+{% endblock %}

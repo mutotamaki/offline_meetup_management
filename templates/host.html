@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+<form method="POST" action="./event_setting_confirm">
+オフ会名: <input type="text" name="event_name" size="40"><br>
+日にち: <input type="date" name="event_date" size="40"><br>
+時間: <input type="time" name="event_time_start" size="40">~<input type="time" name="event_time_end" size="40"><br>
+場所:<input type="text" name="event_place" size="40"><br>
+参加費:<input type="number" name="event_fee" size="40"><br>
+募集人数:<input type="number" name="event_member" size="40"><br>
+キャンセル期限:<input type="date" name="event_cancel" size="40"><br>
+中止の場合:<input type="text" name="event_cancel_case" size="40"><br>
+募集締切:<input type="date" name="event_deadline" size="40"><br>
+詳細:<br>
+<textarea name="event_detail" rows="10" cols="40"></textarea><br>
+<input type="submit" value="登録">
+</form>
+
+
+{% endblock %}

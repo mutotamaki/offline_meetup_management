@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>イベント編集</h2>
+
+<div style="margin: 20px 0;">
+    <a href="../event_detail/{{ event[0] }}" style="background-color: #888; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">詳細ページに戻る</a>
+</div>
+
+<form method="POST">
+    <table style="width: 100%; margin: 20px 0;">
+        <tr>
+            <td style="padding: 10px; width: 20%; font-weight: bold; vertical-align: top;">オフ会名:</td>
+            <td style="padding: 10px;">
+                <input type="text" name="event_name" value="{{ event[2] }}" size="60" required>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">日にち:</td>
+            <td style="padding: 10px;">
+                <input type="date" name="event_date" value="{{ event[3] }}" required>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">時間:</td>
+            <td style="padding: 10px;">
+                <input type="time" name="event_time_start" value="{{ event[4] }}" required>
+                ~
+                <input type="time" name="event_time_end" value="{{ event[5] }}" required>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">場所:</td>
+            <td style="padding: 10px;">
+                <input type="text" name="event_place" value="{{ event[6] }}" size="60" required>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">参加費:</td>
+            <td style="padding: 10px;">
+                <input type="number" name="event_fee" value="{{ event[7] }}" min="0" required>円
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">募集人数:</td>
+            <td style="padding: 10px;">
+                <input type="number" name="event_member" value="{{ event[8] }}" min="1" required>人
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">キャンセル期限:</td>
+            <td style="padding: 10px;">
+                <input type="date" name="event_cancel" value="{{ event[9] if event[9] else '' }}">
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">中止の場合:</td>
+            <td style="padding: 10px;">
+                <input type="text" name="event_cancel_case" value="{{ event[10] if event[10] else '' }}" size="60">
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">募集締切:</td>
+            <td style="padding: 10px;">
+                <input type="date" name="event_deadline" value="{{ event[11] }}" required>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; font-weight: bold; vertical-align: top;">詳細:</td>
+            <td style="padding: 10px;">
+                <textarea name="event_detail" rows="10" cols="60">{{ event[12] if event[12] else '' }}</textarea>
+            </td>
+        </tr>
+    </table>
+    
+    <div style="margin: 20px 0;">
+        <input type="submit" value="更新" style="background-color: #4CAF50; color: white; padding: 15px 30px; border: none; cursor: pointer; border-radius: 4px; font-size: 16px;">
+        <a href="../event_detail/{{ event[0] }}" style="background-color: #f44336; color: white; padding: 15px 30px; text-decoration: none; border-radius: 4px; font-size: 16px; margin-left: 10px;">キャンセル</a>
+    </div>
+</form>
+
+{% endblock %}

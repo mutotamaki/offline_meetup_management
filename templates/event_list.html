@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>イベント一覧</h2>
+
+<div style="margin: 20px 0;">
+    <a href="./host" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">新しいイベントを作成</a>
+</div>
+
+{% if events %}
+<table border="1" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+    <thead>
+        <tr style="background-color: #f0f0f0;">
+            <th style="padding: 10px; text-align: left;">イベント名</th>
+            <th style="padding: 10px; text-align: left;">開催日時</th>
+            <th style="padding: 10px; text-align: left;">場所</th>
+            <th style="padding: 10px; text-align: left;">参加費</th>
+            <th style="padding: 10px; text-align: left;">参加者数</th>
+            <th style="padding: 10px; text-align: left;">主催者</th>
+            <th style="padding: 10px; text-align: left;">募集締切</th>
+            <th style="padding: 10px; text-align: left;">その他詳細</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr>
+            <td style="padding: 10px; font-weight: bold;">{{ event[1] }}</td>
+            <td style="padding: 10px;">
+                {{ event[2] }}<br>
+                <small>{{ event[3] }} ~ {{ event[4] }}</small>
+            </td>
+            <td style="padding: 10px;">{{ event[5] }}</td>
+            <td style="padding: 10px;">{{ event[6] }}円</td>
+            <td style="padding: 10px;">
+                {% if event[10] >= event[7] %}
+                <span style="color: red; font-weight: bold;">
+                    {{ event[10] }} / {{ event[7] }}人
+                </span>
+                <br><small style="color: red;">募集終了</small>
+                {% else %}
+                <span>{{ event[10] }} / {{ event[7] }}人</span>
+                {% endif %}
+            </td>
+            <td style="padding: 10px;">{{ event[9] }}</td>
+            <td style="padding: 10px;">{{ event[8] }}</td>
+            <td style="padding: 10px;">
+                <a href="./event_detail/{{ event[0] }}" style="background-color: #2196F3; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">詳細</a>
+                {% if event[10] < event[7] %}
+                    <br><br>
+                    <form method="POST" action="./join_event/{{ event[0] }}" style="display: inline;">
+                        <input type="submit" value="参加" style="background-color: #4CAF50; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 3px; font-size: 12px;">
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div style="padding: 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+    <p>現在登録されているイベントはありません。</p>
+    <p><a href="./host" style="color: #4CAF50; text-decoration: none;">最初のイベントを作成しませんか？</a></p>
+</div>
+{% endif %}
+
+<div style="margin: 20px 0;">
+    <a href="./" style="background-color: #888; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">メインページに戻る</a>
+</div>
+
+{% endblock %}
