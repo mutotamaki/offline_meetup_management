@@ -4,7 +4,7 @@
 <h2>{{ event[2] }}</h2>
 
 <div style="margin: 20px 0;">
-    <a href="../event_list" style="background-color: #888; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">一覧に戻る</a>
+    <a href="{{ url_for('event_list') }}" style="background-color: #888; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">一覧に戻る</a>
 </div>
 
 <!-- イベント詳細情報 -->
@@ -91,8 +91,8 @@
 {% if event[1] == uid %}
 <div style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
     <h3>主催者メニュー</h3>
-    <a href="/edit_event/{{ event[0] }}" style="background-color: #FF9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-right: 10px;">イベントを編集</a>
-    <form method="POST" action="/delete_event/{{ event[0] }}" style="display: inline;" onsubmit="return confirm('本当にこのイベントを削除しますか？')">
+    <a href="{{ url_for('edit_event', event_id=event[0]) }}" style="background-color: #FF9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-right: 10px;">イベントを編集</a>
+    <form method="POST" action="{{ url_for('delete_event', event_id=event[0]) }}" style="display: inline;" onsubmit="return confirm('本当にこのイベントを削除しますか？')">
         <input type="submit" value="イベントを削除" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px;">
     </form>
 </div>
