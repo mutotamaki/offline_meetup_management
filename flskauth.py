@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, session, redirect
+from flask import Flask, request, render_template, session, redirect, url_for
 import psycopg2
 import hashlib
 from datetime import timedelta
@@ -354,10 +354,10 @@ def edit_event(event_id):
         ))
         connection.commit()
         cur.close()
-        return redirect(f"./event_detail/{event_id}")
+        return redirect(f"../event_detail/{event_id}")
     
     cur.close()
-    return render_template("edit_event.html", event=event, uid=session["uid"], uname=session["uname"])
+    return render_template("./edit_event.html", event=event, uid=session["uid"], uname=session["uname"])
 
 @app.route('/delete_event/<int:event_id>', methods=['POST'])
 def delete_event(event_id):

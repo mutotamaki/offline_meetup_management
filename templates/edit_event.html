@@ -4,7 +4,7 @@
 <h2>イベント編集</h2>
 
 <div style="margin: 20px 0;">
-    <a href="../event_detail/{{ event[0] }}" style="background-color: #888; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">詳細ページに戻る</a>
+    <a href="{{ url_for('event_detail', event_id=event[0]) }}" style="background-color: #888; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">詳細ページに戻る</a>
 </div>
 
 <form method="POST">
@@ -75,7 +75,7 @@
     
     <div style="margin: 20px 0;">
         <input type="submit" value="更新" style="background-color: #4CAF50; color: white; padding: 15px 30px; border: none; cursor: pointer; border-radius: 4px; font-size: 16px;">
-        <a href="../event_detail/{{ event[0] }}" style="background-color: #f44336; color: white; padding: 15px 30px; text-decoration: none; border-radius: 4px; font-size: 16px; margin-left: 10px;">キャンセル</a>
+    <a href="{{ url_for('event_detail', event_id=event[0]) }}" style="background-color: #f44336; color: white; padding: 15px 30px; text-decoration: none; border-radius: 4px; font-size: 16px; margin-left: 10px;">キャンセル</a>
     </div>
 </form>
 
