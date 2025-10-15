@@ -365,17 +365,29 @@ def delete_event(event_id):
         return redirect("./login")
     
     cur = connection.cursor()
-    
-    # 主催者チェックをしてからイベントを論理削除
-    cur.execute("""
-        UPDATE events SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP
-        WHERE event_id = %s AND host_uid = %s AND is_active = TRUE
-    """, (event_id, session["uid"]))
-    
-    if cur.rowcount == 0:
+    # 主催者チェック: イベントが存在し、現在のユーザーが主催者か確認
+    cur.execute("SELECT host_uid FROM events WHERE event_id = %s", (event_id,))
+    row = cur.fetchone()
+    if not row:
         cur.close()
-        return "イベントが見つからないか、削除権限がありません", 403
-    
-    connection.commit()
+        return "イベントが見つかりません", 404
+
+    host_uid = row[0]
+    if host_uid != session["uid"]:
+        cur.close()
+        return "削除権限がありません", 403
+
+    try:
+        # 参加者データを先に削除
+        cur.execute("DELETE FROM event_participants WHERE event_id = %s", (event_id,))
+        # イベント本体を削除
+        cur.execute("DELETE FROM events WHERE event_id = %s", (event_id,))
+        connection.commit()
+    except Exception as e:
+        # エラー時はロールバックしてエラーメッセージを返す
+        connection.rollback()
+        cur.close()
+        return f"削除に失敗しました: {e}", 500
+
     cur.close()
-    return redirect("./event_list")
+    return redirect(url_for('event_list'))
