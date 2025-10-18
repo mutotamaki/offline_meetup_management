@@ -247,8 +247,13 @@ def event_list():
         WHERE e.is_active = TRUE
         AND e.event_date + e.event_time_start >= %s
         GROUP BY e.event_id, f.uname
+<<<<<<< HEAD
         ORDER BY e.event_date ASC, e.event_time_start ASC
     """, (twenty_four_hours_ago,))
+=======
+        ORDER BY ABS(EXTRACT(EPOCH FROM (e.event_date + e.event_time_start::time - NOW()))) ASC
+    """)
+>>>>>>> main
     events = cur.fetchall()
     cur.close()
     
@@ -466,16 +471,23 @@ def participation_confirmed():
     if "uid" not in session:
         return redirect("./login")
     
+<<<<<<< HEAD
     # 24時間前のイベントを削除
     delete_past_events()
     
+=======
+>>>>>>> main
     uid = session["uid"]
     uname = session["uname"]
     
     # 現在のユーザーが参加登録しているイベント一覧を取得
+<<<<<<< HEAD
     # 24時間前より新しいイベントのみ表示
     cur = connection.cursor()
     twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
+=======
+    cur = connection.cursor()
+>>>>>>> main
     cur.execute("""
         SELECT e.event_id, e.event_name, e.event_date, e.event_time_start,
                e.event_time_end, e.event_place, e.event_fee, e.event_member,
@@ -489,12 +501,20 @@ def participation_confirmed():
         LEFT JOIN event_participants ep2 ON e.event_id = ep2.event_id 
                                          AND ep2.status = 'registered'
         WHERE e.is_active = TRUE
+<<<<<<< HEAD
         AND e.event_date + e.event_time_start >= %s
         GROUP BY e.event_id, e.event_name, e.event_date, e.event_time_start,
                  e.event_time_end, e.event_place, e.event_fee, e.event_member,
                  e.event_deadline, f.uname, ep.registered_at
         ORDER BY e.event_date ASC, e.event_time_start ASC
     """, (uid, twenty_four_hours_ago))
+=======
+        GROUP BY e.event_id, e.event_name, e.event_date, e.event_time_start,
+                 e.event_time_end, e.event_place, e.event_fee, e.event_member,
+                 e.event_deadline, f.uname, ep.registered_at
+        ORDER BY ABS(EXTRACT(EPOCH FROM (e.event_date + e.event_time_start::time - NOW()))) ASC
+    """, (uid,))
+>>>>>>> main
     events = cur.fetchall()
     cur.close()
     
