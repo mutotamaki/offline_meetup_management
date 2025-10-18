@@ -47,7 +47,7 @@
                 <a href="{{ url_for('event_detail', event_id=event[0]) }}" style="background-color: #2196F3; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">詳細</a>
                 {% if event[10] < event[7] %}
                     <br><br>
-                    <form method="POST" action="{{ url_for('event_detail', event_id=event[0]) }}" style="display: inline;">
+                    <form method="POST" action="{{ url_for('.event_detail', event_id=event[0]) }}" style="display: inline;">
                         <input type="submit" value="参加" style="background-color: #4CAF50; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 3px; font-size: 12px;">
                     </form>
                 {% endif %}
