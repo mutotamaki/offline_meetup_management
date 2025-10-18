@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>参加確定イベント一覧</h2>
+
+<p>{{ uid }}:{{ uname }} さんが参加登録しているイベント</p>
+
+{% if events %}
+<table border="1" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+    <thead>
+        <tr style="background-color: #f0f0f0;">
+            <th style="padding: 10px; text-align: left;">イベント名</th>
+            <th style="padding: 10px; text-align: left;">開催日時</th>
+            <th style="padding: 10px; text-align: left;">場所</th>
+            <th style="padding: 10px; text-align: left;">参加費</th>
+            <th style="padding: 10px; text-align: left;">参加者数</th>
+            <th style="padding: 10px; text-align: left;">主催者</th>
+            <th style="padding: 10px; text-align: left;">参加登録日</th>
+            <th style="padding: 10px; text-align: left;">詳細・操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr>
+            <td style="padding: 10px; font-weight: bold;">{{ event[1] }}</td>
+            <td style="padding: 10px;">
+                {{ event[2] }}<br>
+                <small>{{ event[3] }} ~ {{ event[4] }}</small>
+            </td>
+            <td style="padding: 10px;">{{ event[5] }}</td>
+            <td style="padding: 10px;">{{ event[6] }}円</td>
+            <td style="padding: 10px;">{{ event[11] }} / {{ event[7] }}人</td>
+            <td style="padding: 10px;">{{ event[9] }}</td>
+            <td style="padding: 10px;">
+                <small>{{ event[10].strftime('%Y-%m-%d %H:%M') if event[10] else '不明' }}</small>
+            </td>
+            <td style="padding: 10px;">
+                <a href="{{ url_for('event_detail', event_id=event[0]) }}" style="background-color: #2196F3; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">詳細</a>
+                <br><br>
+                <form method="POST" action="{{ url_for('event_detail', event_id=event[0]) }}" style="display: inline;">
+                    <input type="hidden" name="action" value="leave">
+                    <input type="submit" value="参加取消" style="background-color: #f44336; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 3px; font-size: 12px;" onclick="return confirm('本当に参加を取り消しますか？');">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="margin: 20px 0; padding: 15px; background-color: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px;">
+    <h4 style="margin-top: 0;">参加イベント数: {{ events|length }}件</h4>
+    <p>イベントの詳細確認や参加取消は各イベントの操作ボタンから行えます。</p>
+</div>
+
+{% else %}
+<div style="padding: 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+    <p>現在参加登録しているイベントはありません。</p>
+    <p><a href="{{ url_for('event_list') }}" style="color: #4CAF50; text-decoration: none;">イベント一覧から参加してみませんか？</a></p>
+</div>
+{% endif %}
+
+<div style="margin: 20px 0;">
+    <a href="{{ url_for('event_list') }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-right: 10px;">イベント一覧</a>
+    <a href="{{ url_for('mypage') }}" style="background-color: #888; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">メインページ</a>
+</div>
+
+{% endblock %}
