@@ -158,6 +158,7 @@ def event_list():
                                event_time_end, event_place, event_fee, event_member, 
                                event_cancel, event_cancel_case, event_deadline, event_detail)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING event_id
         """, (
             session["uid"],
             request.form.get('event_name'),
@@ -172,6 +173,15 @@ def event_list():
             request.form.get('event_deadline'),
             request.form.get('event_detail')
         ))
+        # 作成されたイベントIDを取得
+        new_event_id = cur.fetchone()[0]
+        
+        # 主催者を参加者として自動登録
+        cur.execute("""
+            INSERT INTO event_participants (event_id, user_id, status, registered_at)
+            VALUES (%s, %s, 'registered', CURRENT_TIMESTAMP)
+        """, (new_event_id, session["uid"]))
+        
         connection.commit()
         cur.close()
     
