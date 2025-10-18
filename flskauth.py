@@ -198,7 +198,7 @@ def event_list():
                                         AND ep.status = 'registered'
         WHERE e.is_active = TRUE
         GROUP BY e.event_id, f.uname
-        ORDER BY e.event_date ASC, e.event_time_start ASC
+        ORDER BY ABS(EXTRACT(EPOCH FROM (e.event_date + e.event_time_start::time - NOW()))) ASC
     """)
     events = cur.fetchall()
     cur.close()
@@ -401,3 +401,36 @@ def delete_event(event_id):
 
     cur.close()
     return redirect(url_for('event_list'))
+
+@app.route('/participation_confirmed')
+def participation_confirmed():
+    if "uid" not in session:
+        return redirect("./login")
+    
+    uid = session["uid"]
+    uname = session["uname"]
+    
+    # 現在のユーザーが参加登録しているイベント一覧を取得
+    cur = connection.cursor()
+    cur.execute("""
+        SELECT e.event_id, e.event_name, e.event_date, e.event_time_start,
+               e.event_time_end, e.event_place, e.event_fee, e.event_member,
+               e.event_deadline, f.uname as host_name, ep.registered_at,
+               COUNT(ep2.participant_id) as current_participants
+        FROM events e
+        JOIN flskauth f ON e.host_uid = f.uid
+        JOIN event_participants ep ON e.event_id = ep.event_id 
+                                   AND ep.user_id = %s 
+                                   AND ep.status = 'registered'
+        LEFT JOIN event_participants ep2 ON e.event_id = ep2.event_id 
+                                         AND ep2.status = 'registered'
+        WHERE e.is_active = TRUE
+        GROUP BY e.event_id, e.event_name, e.event_date, e.event_time_start,
+                 e.event_time_end, e.event_place, e.event_fee, e.event_member,
+                 e.event_deadline, f.uname, ep.registered_at
+        ORDER BY ABS(EXTRACT(EPOCH FROM (e.event_date + e.event_time_start::time - NOW()))) ASC
+    """, (uid,))
+    events = cur.fetchall()
+    cur.close()
+    
+    return render_template("participation_confirmed.html", events=events, uid=uid, uname=uname)
