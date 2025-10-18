@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, session, redirect, url_for
 import psycopg2
 import hashlib
-from datetime import timedelta
+from datetime import timedelta, datetime
 #データベースの設定は各自のものに修正すること
 connection = psycopg2.connect("host=localhost dbname=mutotamaki user=mutotamaki password=rl2C1CdD")
 
@@ -10,6 +10,49 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = b'PfnlrpCBaLCFKt39'
 #セッションは30日残る設定
 app.permanent_session_lifetime = timedelta(days=30)
+
+# 24時間前のイベントを削除する関数
+def delete_past_events():
+    """現在時刻から24時間より前のイベントを削除する"""
+    cur = connection.cursor()
+    
+    # 24時間前の日時を計算
+    twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
+    
+    try:
+        # 24時間前より古いイベントを検索
+        cur.execute("""
+            SELECT event_id FROM events 
+            WHERE event_date + event_time_start < %s 
+            AND is_active = TRUE
+        """, (twenty_four_hours_ago,))
+        
+        old_events = cur.fetchall()
+        
+        # 古いイベントがある場合、関連データを削除
+        if old_events:
+            event_ids = [event[0] for event in old_events]
+            
+            # 参加者データを削除
+            cur.execute("""
+                DELETE FROM event_participants 
+                WHERE event_id = ANY(%s)
+            """, (event_ids,))
+            
+            # イベントデータを削除
+            cur.execute("""
+                DELETE FROM events 
+                WHERE event_id = ANY(%s)
+            """, (event_ids,))
+            
+            connection.commit()
+            print(f"削除されたイベント数: {len(event_ids)}")
+    
+    except Exception as e:
+        connection.rollback()
+        print(f"過去イベント削除エラー: {e}")
+    finally:
+        cur.close()
 
 #強制的にhttpsへリダイレクト
 @app.before_request
@@ -149,6 +192,9 @@ def event_list():
     if "uid" not in session:
         return redirect("./login")
     
+    # 24時間前のイベントを削除
+    delete_past_events()
+    
     # POSTの場合はイベント登録処理
     if request.method == 'POST':
         # イベントデータをデータベースに登録
@@ -186,7 +232,9 @@ def event_list():
         cur.close()
     
     # イベント一覧を取得（参加者数も含む）
+    # 24時間前より新しいイベントのみ表示
     cur = connection.cursor()
+    twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
     cur.execute("""
         SELECT e.event_id, e.event_name, e.event_date, e.event_time_start, 
                e.event_time_end, e.event_place, e.event_fee, e.event_member,
@@ -197,9 +245,15 @@ def event_list():
         LEFT JOIN event_participants ep ON e.event_id = ep.event_id 
                                         AND ep.status = 'registered'
         WHERE e.is_active = TRUE
+        AND e.event_date + e.event_time_start >= %s
         GROUP BY e.event_id, f.uname
+<<<<<<< HEAD
+        ORDER BY e.event_date ASC, e.event_time_start ASC
+    """, (twenty_four_hours_ago,))
+=======
         ORDER BY ABS(EXTRACT(EPOCH FROM (e.event_date + e.event_time_start::time - NOW()))) ASC
     """)
+>>>>>>> main
     events = cur.fetchall()
     cur.close()
     
@@ -209,6 +263,9 @@ def event_list():
 def event_detail(event_id):
     if "uid" not in session:
         return redirect("./login")
+    
+    # 24時間前のイベントを削除
+    delete_past_events()
     
     # POSTの場合は参加/キャンセル処理
     if request.method == 'POST':
@@ -274,7 +331,8 @@ def event_detail(event_id):
         return redirect(request.url)
     
     cur = connection.cursor()
-    # イベント詳細情報を取得
+    # イベント詳細情報を取得（24時間前より新しいイベントのみ）
+    twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
     cur.execute("""
         SELECT e.event_id, e.host_uid, e.event_name, e.event_date, 
                e.event_time_start, e.event_time_end, e.event_place, 
@@ -287,11 +345,12 @@ def event_detail(event_id):
         LEFT JOIN event_participants ep ON e.event_id = ep.event_id 
                                         AND ep.status = 'registered'
         WHERE e.event_id = %s AND e.is_active = TRUE
+        AND e.event_date + e.event_time_start >= %s
         GROUP BY e.event_id, e.host_uid, e.event_name, e.event_date,
                  e.event_time_start, e.event_time_end, e.event_place,
                  e.event_fee, e.event_member, e.event_cancel,
                  e.event_cancel_case, e.event_deadline, e.event_detail, f.uname
-    """, (event_id,))
+    """, (event_id, twenty_four_hours_ago))
     event = cur.fetchone()
     
     if not event:
@@ -325,13 +384,18 @@ def edit_event(event_id):
     if "uid" not in session:
         return redirect("./login")
     
+    # 24時間前のイベントを削除
+    delete_past_events()
+    
     cur = connection.cursor()
     
-    # イベント情報を取得し、主催者チェック
+    # イベント情報を取得し、主催者チェック（24時間前より新しいイベントのみ）
+    twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
     cur.execute("""
         SELECT * FROM events 
         WHERE event_id = %s AND host_uid = %s AND is_active = TRUE
-    """, (event_id, session["uid"]))
+        AND event_date + event_time_start >= %s
+    """, (event_id, session["uid"], twenty_four_hours_ago))
     event = cur.fetchone()
     
     if not event:
@@ -407,11 +471,23 @@ def participation_confirmed():
     if "uid" not in session:
         return redirect("./login")
     
+<<<<<<< HEAD
+    # 24時間前のイベントを削除
+    delete_past_events()
+    
+=======
+>>>>>>> main
     uid = session["uid"]
     uname = session["uname"]
     
     # 現在のユーザーが参加登録しているイベント一覧を取得
+<<<<<<< HEAD
+    # 24時間前より新しいイベントのみ表示
     cur = connection.cursor()
+    twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
+=======
+    cur = connection.cursor()
+>>>>>>> main
     cur.execute("""
         SELECT e.event_id, e.event_name, e.event_date, e.event_time_start,
                e.event_time_end, e.event_place, e.event_fee, e.event_member,
@@ -425,11 +501,20 @@ def participation_confirmed():
         LEFT JOIN event_participants ep2 ON e.event_id = ep2.event_id 
                                          AND ep2.status = 'registered'
         WHERE e.is_active = TRUE
+<<<<<<< HEAD
+        AND e.event_date + e.event_time_start >= %s
+        GROUP BY e.event_id, e.event_name, e.event_date, e.event_time_start,
+                 e.event_time_end, e.event_place, e.event_fee, e.event_member,
+                 e.event_deadline, f.uname, ep.registered_at
+        ORDER BY e.event_date ASC, e.event_time_start ASC
+    """, (uid, twenty_four_hours_ago))
+=======
         GROUP BY e.event_id, e.event_name, e.event_date, e.event_time_start,
                  e.event_time_end, e.event_place, e.event_fee, e.event_member,
                  e.event_deadline, f.uname, ep.registered_at
         ORDER BY ABS(EXTRACT(EPOCH FROM (e.event_date + e.event_time_start::time - NOW()))) ASC
     """, (uid,))
+>>>>>>> main
     events = cur.fetchall()
     cur.close()
     
